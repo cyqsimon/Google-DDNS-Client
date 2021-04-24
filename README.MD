@@ -1,4 +1,4 @@
-## Google-DNS-Client
+## Google-DDNS-Client
 A bash script that uses Google Domain API to set DDNS for host
 
 ## Features
