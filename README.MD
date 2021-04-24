@@ -1,6 +1,8 @@
 ## Google-DDNS-Client
 A bash script that uses Google Domain API to set DDNS for host
 
+For API docs, see https://support.google.com/domains/answer/6147083
+
 ## Features
 - Uses https://www.ipify.org/ to check for public IP
 - Can use a custom proxy to access API if necessary
