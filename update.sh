@@ -50,7 +50,7 @@ if [[ "$ddns_res" =~ "good" ]]; then
   echo "Public IP successfully updated from $dns_public_ip to $actual_public_ip"
   exit 0
 elif [[ "$ddns_res" =~ "nochg" ]]; then
-  echo "API reports public IP has not changed: $dns_public_ip"
+  echo "API reports public IP has not changed: $actual_public_ip; please wait for DNS record to propagate"
   exit 0
 elif [[ "$ddns_res" =~ "911" ]]; then
   echo "API has errored; will keep retrying"
