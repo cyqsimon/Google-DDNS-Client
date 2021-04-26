@@ -32,7 +32,7 @@ dns_public_ip=`dig +short "$hostname"`
 # get actual IP
 actual_public_ip=`curl --silent --fail "https://api.ipify.org"`
 if [[ "$?" != "0" ]]; then
-  echo "G-DDNS: [${date +"%F %T"}] Cannot get current IP via API (cURL error $?); exiting"
+  echo "G-DDNS: [${date +"%F %T"}] Cannot get current IP via API (cURL error $?); exiting; will keep retrying"
   exit 4
 fi
 
@@ -49,26 +49,26 @@ export https_proxy=$ddns_api_proxy
 # send update request to DDNS API
 req_url="https://$username:$password@domains.google.com/nic/update?hostname=$hostname&myip=$actual_public_ip"
 ddns_res=`curl --silent --fail "$req_url"`
-curl_update_exit_code=$?
+curl_update_exit_code="$?"
 echo "G-DDNS: [${date +"%F %T"}] Update request sent:"
 echo -e "G-DDNS: [${date +"%F %T"}] \t$req_url"
 if [[ "$curl_update_exit_code" != "0" ]]; then
-  echo "G-DDNS: [${date +"%F %T"}] Update request via API failed (cURL error $?); exiting"
+  echo "G-DDNS: [${date +"%F %T"}] Update request via API failed (cURL error $?); exiting; will keep retrying"
   exit 4
 fi
 
 # handle API response
 if [[ "$ddns_res" =~ "good" ]]; then
-  echo "G-DDNS: [${date +"%F %T"}] Public IP successfully updated from $dns_public_ip to $actual_public_ip"
+  echo "G-DDNS: [${date +"%F %T"}] Public IP successfully updated from $dns_public_ip to $actual_public_ip; exiting"
   exit 0
 elif [[ "$ddns_res" =~ "nochg" ]]; then
-  echo "G-DDNS: [${date +"%F %T"}] API reports public IP has not changed: $actual_public_ip; please wait for DNS record to propagate"
+  echo "G-DDNS: [${date +"%F %T"}] API reports public IP has not changed: $actual_public_ip; please wait for DNS record to propagate; exiting"
   exit 0
 elif [[ "$ddns_res" =~ "911" ]]; then
-  echo "G-DDNS: [${date +"%F %T"}] API has errored; will keep retrying"
+  echo "G-DDNS: [${date +"%F %T"}] API has errored; exiting; will keep retrying"
   exit 1
 else
-  echo "Error reason: $ddns_res" > "./script_error"
-  echo "G-DDNS: [${date +"%F %T"}] API reports request error: $ddns_res; will stop retrying"
+  echo "[${date +"%F %T"}] Error reason: $ddns_res" > "./script_error"
+  echo "G-DDNS: [${date +"%F %T"}] API reports request error: $ddns_res; exiting; will stop retrying"
   exit 2
 fi
