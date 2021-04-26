@@ -2,10 +2,11 @@
 
 # exit codes:
 ## 0: updated / no change
-## 1: API errored
-## 2: API reports script error
-## 3: script has previously errored
-## 4: other network error
+## 1: Google DDNS API errored
+## 2: Google DDNS API reports request error
+## 3: Google DDNS API request has previously errored
+## 4: network error
+## 5: ipify API errored
 
 # parameters
 hostname="CHANGE_ME" # your fully qualified domain name (FQDN)
@@ -20,7 +21,7 @@ cd `dirname "$0"`
 
 # exit if script has previously errored
 if [ -f "./script_error" ]; then
-  echo "G-DDNS: [$(date +"%F %T")] Script has previously errored; exiting" | tee -a "$log_path"
+  echo "G-DDNS: [$(date +"%F %T")] Google API DDNS request has previously errored; exiting" | tee -a "$log_path"
   exit 3
 fi
 
@@ -48,8 +49,8 @@ if [[ "$curl_exit_code" != "0" ]]; then
   exit 4
 fi
 if (( $curl_status > 399 )); then
-  echo "G-DDNS: [$(date +"%F %T")] Cannot get current IP via ipify API (bad response $curl_status); exiting; will keep retrying" | tee -a "$log_path"
-  exit 4
+  echo "G-DDNS: [$(date +"%F %T")] Cannot get current IP via ipify API (bad http status $curl_status); exiting; will keep retrying" | tee -a "$log_path"
+  exit 5
 fi
 actual_public_ip=`cat "$tmp_path"`
 
@@ -74,8 +75,8 @@ if [[ "$curl_exit_code" != "0" ]]; then
   exit 4
 fi
 if (( $curl_status > 399 )); then
-  echo "G-DDNS: [$(date +"%F %T")] Update request via G-DDNS API failed (bad response $curl_status); exiting; will keep retrying" | tee -a "$log_path"
-  exit 4
+  echo "G-DDNS: [$(date +"%F %T")] G-DDNS API has errored (bad http status $curl_status); exiting; will keep retrying" | tee -a "$log_path"
+  exit 1
 fi
 ddns_res=`cat "$tmp_path"`
 
@@ -87,7 +88,7 @@ elif [[ "$ddns_res" =~ "nochg" ]]; then
   echo "G-DDNS: [$(date +"%F %T")] G-DDNS API reports public IP has not changed: $actual_public_ip; please wait for DNS record to propagate; exiting" | tee -a "$log_path"
   exit 0
 elif [[ "$ddns_res" =~ "911" ]]; then
-  echo "G-DDNS: [$(date +"%F %T")] G-DDNS API has errored; exiting; will keep retrying" | tee -a "$log_path"
+  echo "G-DDNS: [$(date +"%F %T")] G-DDNS API has errored (response body 911); exiting; will keep retrying" | tee -a "$log_path"
   exit 1
 else
   touch "./script_error"
