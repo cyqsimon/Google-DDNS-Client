@@ -5,6 +5,7 @@
 ## 1: API errored
 ## 2: API reports script error
 ## 3: script has previously errored
+## 4: other network error
 
 # parameters
 hostname="CHANGE_ME" # your fully qualified domain name (FQDN)
@@ -25,9 +26,15 @@ fi
 export http_proxy=""
 export https_proxy=""
 
-# get current DNS info
+# get current DNS mapping
 dns_public_ip=`dig +short "$hostname"`
-actual_public_ip=`curl --silent "https://api.ipify.org"`
+
+# get actual IP
+actual_public_ip=`curl --silent --fail "https://api.ipify.org"`
+if [[ "$?" != "0" ]]; then
+  echo "G-DDNS: [${date +"%F %T"}] Cannot get current IP via API (cURL error $?); exiting"
+  exit 4
+fi
 
 # check for IP change
 if [[ "$dns_public_ip" == "$actual_public_ip" ]]; then
@@ -41,9 +48,14 @@ export https_proxy=$ddns_api_proxy
 
 # send update request to DDNS API
 req_url="https://$username:$password@domains.google.com/nic/update?hostname=$hostname&myip=$actual_public_ip"
-ddns_res=`curl --silent "$req_url"`
+ddns_res=`curl --silent --fail "$req_url"`
+curl_update_exit_code=$?
 echo "G-DDNS: [${date +"%F %T"}] Update request sent:"
 echo -e "G-DDNS: [${date +"%F %T"}] \t$req_url"
+if [[ "$curl_update_exit_code" != "0" ]]; then
+  echo "G-DDNS: [${date +"%F %T"}] Update request via API failed (cURL error $?); exiting"
+  exit 4
+fi
 
 # handle API response
 if [[ "$ddns_res" =~ "good" ]]; then
