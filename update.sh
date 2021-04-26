@@ -31,8 +31,9 @@ dns_public_ip=`dig +short "$hostname"`
 
 # get actual IP
 actual_public_ip=`curl --silent --fail "https://api.ipify.org"`
-if [[ "$?" != "0" ]]; then
-  echo "G-DDNS: [${date +"%F %T"}] Cannot get current IP via API (cURL error $?); exiting; will keep retrying"
+curl_exit_code="$?"
+if [[ "$curl_exit_code" != "0" ]]; then
+  echo "G-DDNS: [${date +"%F %T"}] Cannot get current IP via API (cURL error $curl_exit_code); exiting; will keep retrying"
   exit 4
 fi
 
@@ -49,11 +50,11 @@ export https_proxy=$ddns_api_proxy
 # send update request to DDNS API
 req_url="https://$username:$password@domains.google.com/nic/update?hostname=$hostname&myip=$actual_public_ip"
 ddns_res=`curl --silent --fail "$req_url"`
-curl_update_exit_code="$?"
+curl_exit_code="$?"
 echo "G-DDNS: [${date +"%F %T"}] Update request sent:"
 echo -e "G-DDNS: [${date +"%F %T"}] \t$req_url"
-if [[ "$curl_update_exit_code" != "0" ]]; then
-  echo "G-DDNS: [${date +"%F %T"}] Update request via API failed (cURL error $?); exiting; will keep retrying"
+if [[ "$curl_exit_code" != "0" ]]; then
+  echo "G-DDNS: [${date +"%F %T"}] Update request via API failed (cURL error $curl_exit_code); exiting; will keep retrying"
   exit 4
 fi
 
