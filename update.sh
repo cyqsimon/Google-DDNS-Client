@@ -27,7 +27,16 @@ export http_proxy=""
 export https_proxy=""
 
 # get current DNS mapping
-dns_public_ip=`dig +short "$hostname"`
+dns_records=`dig +short "$hostname"`
+dig_exit_code="$?"
+if [[ "$dig_exit_code" != "0" ]]; then
+  echo "G-DDNS: [$(date +"%F %T")] Cannot get current DNS mapping (dig error $dig_exit_code); exiting; will keep retrying"
+  exit 4
+exit
+dns_public_ip=`echo "$dns_records" | grep -v ":" | head -1` # filter out IPv6 and use 1st entry
+if [[ "$dns_public_ip" == "" ]]; then
+  echo "G-DDNS: [$(date +"%F %T")] Found no current DNS mapping"
+fi
 
 # get actual IP
 actual_public_ip=`curl --silent --fail "https://api.ipify.org"`
