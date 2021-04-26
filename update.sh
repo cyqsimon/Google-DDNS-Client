@@ -43,7 +43,7 @@ fi
 actual_public_ip=`curl --silent --fail "https://api.ipify.org"`
 curl_exit_code="$?"
 if [[ "$curl_exit_code" != "0" ]]; then
-  echo "G-DDNS: [$(date +"%F %T")] Cannot get current IP via API (cURL error $curl_exit_code); exiting; will keep retrying" | tee -a "$log_path"
+  echo "G-DDNS: [$(date +"%F %T")] Cannot get current IP via ipify API (cURL error $curl_exit_code); exiting; will keep retrying" | tee -a "$log_path"
   exit 4
 fi
 
@@ -64,7 +64,7 @@ curl_exit_code="$?"
 echo "G-DDNS: [$(date +"%F %T")] Update request sent:" | tee -a "$log_path"
 echo -e "G-DDNS: [$(date +"%F %T")] \t$req_url" | tee -a "$log_path"
 if [[ "$curl_exit_code" != "0" ]]; then
-  echo "G-DDNS: [$(date +"%F %T")] Update request via API failed (cURL error $curl_exit_code); exiting; will keep retrying" | tee -a "$log_path"
+  echo "G-DDNS: [$(date +"%F %T")] Update request via G-DDNS API failed (cURL error $curl_exit_code); exiting; will keep retrying" | tee -a "$log_path"
   exit 4
 fi
 
@@ -73,13 +73,13 @@ if [[ "$ddns_res" =~ "good" ]]; then
   echo "G-DDNS: [$(date +"%F %T")] Public IP successfully updated from $dns_public_ip to $actual_public_ip; exiting" | tee -a "$log_path"
   exit 0
 elif [[ "$ddns_res" =~ "nochg" ]]; then
-  echo "G-DDNS: [$(date +"%F %T")] API reports public IP has not changed: $actual_public_ip; please wait for DNS record to propagate; exiting" | tee -a "$log_path"
+  echo "G-DDNS: [$(date +"%F %T")] G-DDNS API reports public IP has not changed: $actual_public_ip; please wait for DNS record to propagate; exiting" | tee -a "$log_path"
   exit 0
 elif [[ "$ddns_res" =~ "911" ]]; then
-  echo "G-DDNS: [$(date +"%F %T")] API has errored; exiting; will keep retrying" | tee -a "$log_path"
+  echo "G-DDNS: [$(date +"%F %T")] G-DDNS API has errored; exiting; will keep retrying" | tee -a "$log_path"
   exit 1
 else
   touch "./script_error"
-  echo "G-DDNS: [$(date +"%F %T")] API reports request error: $ddns_res; exiting; will stop retrying" | tee -a "$log_path"
+  echo "G-DDNS: [$(date +"%F %T")] G-DDNS API reports request error: $ddns_res; exiting; will stop retrying" | tee -a "$log_path"
   exit 2
 fi
