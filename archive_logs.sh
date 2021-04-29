@@ -17,23 +17,26 @@ fi
 which 7za > /dev/null
 use_zip="$?"
 
-# archive and auto-remove
+# archive and clear
 if [[ "$use_zip" == "0" ]]; then
   archive_name="$log_archive_dir/log_$(date +"%F_%T").7z"
   7za a "$archive_name" "$log_path"
+  7za t "$archive_name"
   if [[ "$?" == "0" ]]; then
-    echo "Current logs archived to $(realpath "$archive_name")"
     echo "" > "$log_path"
+    echo "Current logs archived to $(realpath "$archive_name")"
   else
+    rm -f "$archive_name"
     echo "Archiving with 7za failed, exiting"
   fi
 else
   archive_name="$log_archive_dir/log_$(date +"%F_%T").zip"
   zip --move --test "$archive_name" "$log_path"
   if [[ "$?" == "0" ]]; then
-    echo "Current logs archived to $(realpath "$archive_name")"
     touch "$log_path"
+    echo "Current logs archived to $(realpath "$archive_name")"
   else
+    rm -f "$archive_name"
     echo "Archiving with zip failed, exiting"
   fi
 fi
