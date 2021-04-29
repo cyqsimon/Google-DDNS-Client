@@ -26,7 +26,7 @@ if [[ "$use_zip" == "0" ]]; then
   7za a "$archive_name" "$log_path"
   7za t "$archive_name"
   if [[ "$?" == "0" ]]; then
-    echo "" > "$log_path"
+    > "$log_path"
     echo "Current logs archived to $(realpath "$archive_name")"
   else
     rm -f "$archive_name"
