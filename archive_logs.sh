@@ -23,8 +23,8 @@ mkdir -p "$log_archive_dir"
 # archive and clear
 if [[ "$use_zip" == "0" ]]; then
   archive_name="$log_archive_dir/log_$(date +"%F_%T").7z"
-  7za a "$archive_name" "$log_path"
-  7za t "$archive_name"
+  7za a -y -bsp0 -bso0 "$archive_name" "$log_path"
+  7za t -y -bsp0 -bso0 "$archive_name"
   if [[ "$?" == "0" ]]; then
     > "$log_path"
     echo "Current logs archived to $(realpath "$archive_name")"
