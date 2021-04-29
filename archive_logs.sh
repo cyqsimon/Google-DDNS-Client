@@ -17,6 +17,9 @@ fi
 which 7za > /dev/null
 use_zip="$?"
 
+# make archive directory
+mkdir -p "$log_archive_dir"
+
 # archive and clear
 if [[ "$use_zip" == "0" ]]; then
   archive_name="$log_archive_dir/log_$(date +"%F_%T").7z"
