@@ -14,7 +14,7 @@ if [[ ! -s "$log_path" ]]; then
 fi
 
 # check if 7za exists, else fall back to zip
-which 7za 1> /dev/null 2> &1
+which 7za 1> /dev/null 2>&1
 use_zip="$?"
 
 # make archive directory
