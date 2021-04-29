@@ -22,7 +22,7 @@ mkdir -p "$log_archive_dir"
 
 # archive and clear
 if [[ "$use_zip" == "0" ]]; then
-  archive_name="$log_archive_dir/log_$(date +"%F_%T").7z"
+  archive_name="$log_archive_dir/log_$(date +"%F_%H-%M-%S").7z"
   7za a -y -bsp0 -bso0 "$archive_name" "$log_path"
   7za t -y -bsp0 -bso0 "$archive_name"
   if [[ "$?" == "0" ]]; then
@@ -33,7 +33,7 @@ if [[ "$use_zip" == "0" ]]; then
     echo "Archiving with 7za failed, exiting"
   fi
 else
-  archive_name="$log_archive_dir/log_$(date +"%F_%T").zip"
+  archive_name="$log_archive_dir/log_$(date +"%F_%H-%M-%S").zip"
   zip --quiet --move --test "$archive_name" "$log_path"
   if [[ "$?" == "0" ]]; then
     touch "$log_path"
