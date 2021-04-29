@@ -34,7 +34,7 @@ if [[ "$use_zip" == "0" ]]; then
   fi
 else
   archive_name="$log_archive_dir/log_$(date +"%F_%T").zip"
-  zip --move --test "$archive_name" "$log_path"
+  zip --quiet --move --test "$archive_name" "$log_path"
   if [[ "$?" == "0" ]]; then
     touch "$log_path"
     echo "Current logs archived to $(realpath "$archive_name")"
