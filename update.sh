@@ -47,11 +47,11 @@ while true; do
       echo "G-DDNS: [$(date +"%F %T")] dig found no current DNS mapping (attempt #$dig_attempts); retrying in 3 seconds" | tee -a "$log_path"
       sleep 3
       continue
-    elif
+    else
       echo "G-DDNS: [$(date +"%F %T")] dig found no current DNS mapping after $dig_attempts attempts; continuing with update" | tee -a "$log_path"
       break
     fi
-  elif
+  else
     echo "G-DDNS: [$(date +"%F %T")] $hostname is currently mapped to $dns_public_ip" | tee -a "$log_path"
     break
   fi
