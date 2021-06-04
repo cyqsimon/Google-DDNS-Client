@@ -45,19 +45,18 @@ while true; do
     exit 4
   fi
   dns_public_ip=`echo "$dns_records" | grep -v ":" | head -1` # filter out IPv6 and use 1st entry
-  if [[ "$dns_public_ip" == "" ]]; then
-    # dig found no IP
-    if [[ $dig_attempts -lt 2 ]]; then # try up to 3 times
-      dig_attempts=$((dig_attempts + 1))
-      prefix_log "dig found no current DNS mapping (attempt #$dig_attempts); retrying in 3 seconds"
-      sleep 3
-      continue
-    else
-      prefix_log "dig found no current DNS mapping after $dig_attempts attempts; continuing with update"
-      break
-    fi
-  else
+  # dig found IP
+  if [[ "$dns_public_ip" != "" ]]; then
     prefix_log "$hostname is currently mapped to $dns_public_ip"
+    break
+  fi
+  # dig found no IP
+  if [[ $dig_attempts -lt 2 ]]; then # try up to 3 times
+    dig_attempts=$((dig_attempts + 1))
+    prefix_log "dig found no current DNS mapping (attempt #$dig_attempts); retrying in 3 seconds"
+    sleep 3
+  else
+    prefix_log "dig found no current DNS mapping after $dig_attempts attempts; continuing with update"
     break
   fi
 done
