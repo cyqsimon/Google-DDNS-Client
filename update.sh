@@ -38,6 +38,7 @@ export https_proxy=""
 # retry in case DNS is badly-behaved (e.g. many ISP routers)
 dig_attempts=0
 while true; do
+  dig_attempts=$((dig_attempts + 1))
   dns_records=`dig +short "$hostname"`
   dig_exit_code="$?"
   if [[ "$dig_exit_code" != "0" ]]; then
@@ -51,10 +52,9 @@ while true; do
     break
   fi
   # dig found no IP
-  if [[ $dig_attempts -lt 2 ]]; then # try up to 3 times
-    dig_attempts=$((dig_attempts + 1))
-    prefix_log "dig found no current DNS mapping (attempt #$dig_attempts); retrying in 3 seconds"
-    sleep 3
+  if [[ $dig_attempts -lt 4 ]]; then # try up to 5 times
+    prefix_log "dig found no current DNS mapping (attempt #$dig_attempts); retrying in 10 seconds"
+    sleep 10
   else
     prefix_log "dig found no current DNS mapping after $dig_attempts attempts; continuing with update"
     break
