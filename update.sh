@@ -30,16 +30,32 @@ export http_proxy=""
 export https_proxy=""
 
 # get current DNS mapping
-dns_records=`dig +short "$hostname"`
-dig_exit_code="$?"
-if [[ "$dig_exit_code" != "0" ]]; then
-  echo "G-DDNS: [$(date +"%F %T")] Cannot get current DNS mapping (dig error $dig_exit_code); exiting; will keep retrying" | tee -a "$log_path"
-  exit 4
-fi
-dns_public_ip=`echo "$dns_records" | grep -v ":" | head -1` # filter out IPv6 and use 1st entry
-if [[ "$dns_public_ip" == "" ]]; then
-  echo "G-DDNS: [$(date +"%F %T")] Found no current DNS mapping" | tee -a "$log_path"
-fi
+# retry in case DNS is badly-behaved (e.g. many ISP routers)
+dig_attempts=0
+while true; do
+  dns_records=`dig +short "$hostname"`
+  dig_exit_code="$?"
+  if [[ "$dig_exit_code" != "0" ]]; then
+    echo "G-DDNS: [$(date +"%F %T")] Cannot get current DNS mapping (dig error $dig_exit_code); exiting; will keep retrying" | tee -a "$log_path"
+    exit 4
+  fi
+  dns_public_ip=`echo "$dns_records" | grep -v ":" | head -1` # filter out IPv6 and use 1st entry
+  if [[ "$dns_public_ip" == "" ]]; then
+    # dig found no IP
+    if [[ $dig_attempts -lt 2 ]]; then # try up to 3 times
+      dig_attempts=$((dig_attempts + 1))
+      echo "G-DDNS: [$(date +"%F %T")] dig found no current DNS mapping (attempt #$dig_attempts); retrying in 3 seconds" | tee -a "$log_path"
+      sleep 3
+      continue
+    elif
+      echo "G-DDNS: [$(date +"%F %T")] dig found no current DNS mapping after $dig_attempts attempts; continuing with update" | tee -a "$log_path"
+      break
+    fi
+  elif
+    echo "G-DDNS: [$(date +"%F %T")] $hostname is currently mapped to $dns_public_ip" | tee -a "$log_path"
+    break
+  fi
+done
 
 # get actual IP
 curl_status=`curl --silent --output "$tmp_path" --write-out "%{http_code}" "https://api.ipify.org"`
