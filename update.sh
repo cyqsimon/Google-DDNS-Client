@@ -35,7 +35,7 @@ export http_proxy=""
 export https_proxy=""
 
 # get current DNS mapping
-# retry in case DNS is badly-behaved (e.g. many ISP routers)
+# retry in case DNS is badly-behaved (e.g. many shit ISP routers)
 dig_attempts=0
 while true; do
   dig_attempts=$((dig_attempts + 1))
