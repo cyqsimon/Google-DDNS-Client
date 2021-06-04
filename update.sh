@@ -66,10 +66,11 @@ export https_proxy=$ddns_api_proxy
 
 # send update request to DDNS API
 req_url="https://$username:$password@domains.google.com/nic/update?hostname=$hostname&myip=$actual_public_ip"
+req_url_print="https://****:****@domains.google.com/nic/update?hostname=$hostname&myip=$actual_public_ip"
 curl_status=`curl --silent --output "$tmp_path" --write-out "%{http_code}" "$req_url"`
 curl_exit_code="$?"
 echo "G-DDNS: [$(date +"%F %T")] Update request sent:" | tee -a "$log_path"
-echo -e "G-DDNS: [$(date +"%F %T")] \t$req_url" | tee -a "$log_path"
+echo -e "G-DDNS: [$(date +"%F %T")] \t(username & password hidden) $req_url_print" | tee -a "$log_path"
 if [[ "$curl_exit_code" != "0" ]]; then
   echo "G-DDNS: [$(date +"%F %T")] Update request via G-DDNS API failed (cURL error $curl_exit_code); exiting; will keep retrying" | tee -a "$log_path"
   exit 4
