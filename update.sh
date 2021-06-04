@@ -52,7 +52,7 @@ while true; do
     break
   fi
   # dig found no IP
-  if [[ $dig_attempts -lt 4 ]]; then # try up to 5 times
+  if [[ $dig_attempts -lt 5 ]]; then # try up to 5 times
     prefix_log "dig found no current DNS mapping (attempt #$dig_attempts); retrying in 10 seconds"
     sleep 10
   else
