@@ -73,6 +73,7 @@ if (( $curl_status > 399 )); then
   exit 5
 fi
 actual_public_ip=`cat "$tmp_path"`
+rm -f "$tmp_path"
 
 # check for IP change
 if [[ "$dns_public_ip" == "$actual_public_ip" ]]; then
