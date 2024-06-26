@@ -1,3 +1,9 @@
+## Archival notice
+
+Google Domain was purchased by Squarespace on 2023-06-15, with all domains transferred a year later on 2024-06-15. Google's DDNS API has since been shut down, and Squarespace irritatingly does not offer DDNS support. Therefore this repository is no longer useful.
+
+Personally I have transferred my domain to [NameSilo](https://www.namesilo.com/). Their offering is inexpensive, reputable, and feature-rich (includes DDNS). For DDNS client, I can recommend [ddns-go](https://github.com/jeessy2/ddns-go/). It's written in a *real* language and is actively-maintained.
+
 ## Google-DDNS-Client
 A bash script that uses Google Domain API to set DDNS for host
 
